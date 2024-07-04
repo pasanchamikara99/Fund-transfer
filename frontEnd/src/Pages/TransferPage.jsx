@@ -17,6 +17,7 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import SubBtn from "../components/SubBtn";
 import Currencise from "../assets/countries.json";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export const TransferPage = () => {
   const [selectedCountryFrom, setSelectedCountryFrom] = useState("");
@@ -59,8 +60,34 @@ export const TransferPage = () => {
     setConvertedAmount(converted.toFixed(2));
   };
 
-  const handleClick = () => {
-    console.log(import.meta.env.VITE_APP_API_URL);
+  const handleClick = async () => {
+    try {
+      const data = {
+        fromCountry: selectedCountryFrom,
+        toCountry: selectedCountryTo,
+        amount: amount,
+        convertedAmount: convertedAmount,
+      };
+
+      const response = await axios.post(
+        "http://localhost:4005/transfer/addtransfer",
+        data
+      );
+
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Found Transfer Successfull",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong!",
+      });
+    }
   };
 
   return (
