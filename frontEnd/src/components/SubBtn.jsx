@@ -17,7 +17,7 @@ const SubBtn = ({ onClick }) => {
   return (
     <div>
       {" "}
-      <MyStyledButton onClick={onClick}>Submit</MyStyledButton>
+      <MyStyledButton onClick={onClick}>Transfer</MyStyledButton>
     </div>
   );
 };
