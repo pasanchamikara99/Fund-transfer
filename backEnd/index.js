@@ -4,6 +4,10 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const transferRouter = require("./routes/transferRoutes");
 const app = express();
+const cors = require("cors");
+
+app.use(cors());
+
 app.use(express.json());
 app.use(transferRouter);
 
