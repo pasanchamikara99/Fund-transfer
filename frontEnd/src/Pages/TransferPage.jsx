@@ -13,113 +13,174 @@ import {
   Input,
   TextField,
 } from "@mui/material";
-
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import SubBtn from "../components/SubBtn";
+import Currencise from "../assets/countries.json";
+import axios from "axios";
 
 export const TransferPage = () => {
-  const [countries, setCountries] = useState([]);
   const [selectedCountryFrom, setSelectedCountryFrom] = useState("");
   const [selectedCountryTo, setSelectedCountryTo] = useState("");
-
-  useEffect(() => {
-    fetch("https://restcountries.com/v3.1/all")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-
-        const filteredCountries = data.filter((country) =>
-          ["India", "United States", "Australia", "Sri Lanka"].includes(
-            country.name.common
-          )
-        );
-        setCountries(filteredCountries);
-      })
-      .catch((error) => console.error("Error fetching countries:", error));
-  }, []);
+  const [exchangeRates, setExchangeRates] = useState({});
+  const [amount, setAmount] = useState("");
+  const [convertedAmount, setConvertedAmount] = useState("");
 
   const handleChangeTo = (event) => {
     setSelectedCountryTo(event.target.value);
+    setAmount(0);
+    setConvertedAmount(0);
   };
 
-  const handleChangeFrom = (event) => {
+  const handleChangeFrom = async (event) => {
     setSelectedCountryFrom(event.target.value);
+
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_APP_API_URL}${event.target.value}`
+      );
+      setExchangeRates(response.data.conversion_rates);
+    } catch (error) {
+      console.error("Error fetching exchange rates:", error);
+    }
+
+    setAmount(0);
+    setConvertedAmount(0);
+  };
+
+  const handleAmountChange = (e) => {
+    const inputAmount = e.target.value;
+    setAmount(inputAmount);
+    convertAmount(inputAmount, selectedCountryTo);
+  };
+
+  const convertAmount = (inputAmount, toCountry) => {
+    const rate = exchangeRates[toCountry] || 1;
+    const converted = inputAmount * rate;
+    setConvertedAmount(converted.toFixed(2));
   };
 
   const handleClick = () => {
-    console.log("clicked");
+    console.log(import.meta.env.VITE_APP_API_URL);
   };
 
   return (
     <div>
-      <Container>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Country Flags
-        </Typography>
-        <Box sx={{ display: "flex", flexDirection: "row", gap: 3 }}>
-          <FormControl sx={{ width: 250 }}>
-            <InputLabel id="country-select-from-label">From Country</InputLabel>
-            <Select
-              labelId="country-select-from-label"
-              value={selectedCountryFrom}
-              label="From Country"
-              onChange={handleChangeFrom}
-            >
-              {countries.map((country) => (
-                <MenuItem key={country.cca3} value={country.name.common}>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Avatar
-                      src={country.flags.png}
-                      alt={`Flag of ${country.name.common}`}
-                      sx={{ width: 24, height: 24, marginRight: 1 }}
-                    />
-                    <ListItemText primary={country.name.common} />
-                  </Box>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl sx={{ width: 250 }}>
-            <InputLabel id="country-select-to-label">To Country</InputLabel>
-            <Select
-              labelId="country-select-to-label"
-              value={selectedCountryTo}
-              label="To Country"
-              onChange={handleChangeTo}
-            >
-              {countries.map((country) => (
-                <MenuItem key={country.cca3} value={country.name.common}>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Avatar
-                      src={country.flags.png}
-                      alt={`Flag of ${country.name.common}`}
-                      sx={{ width: 24, height: 24, marginRight: 1 }}
-                    />
-                    <ListItemText primary={country.name.common} />
-                  </Box>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-
+      <Container align="center">
         <Box
-          component="form"
           sx={{
-            "& > :not(style)": { my: 2, width: "525px" },
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+            backgroundColor: "#e0f7fa",
           }}
-          noValidate
-          autoComplete="off"
         >
-          <TextField
-            id="outlined-basic"
-            label="Amount"
-            variant="outlined"
-            required
-          />
-        </Box>
+          <Box
+            sx={{
+              p: 4,
+              boxShadow: 3,
+              backgroundColor: "#f5f5f5",
+              borderRadius: 2,
+              maxWidth: "600px",
+              mx: "auto",
+            }}
+          >
+            <Typography variant="h4" component="h1" gutterBottom sx={{ my: 5 }}>
+              Currency Converter
+            </Typography>
+            <Box sx={{ gap: 1 }}>
+              <FormControl sx={{ width: 250 }}>
+                <InputLabel id="country-select-from-label">
+                  From Country
+                </InputLabel>
+                <Select
+                  labelId="country-select-from-label"
+                  value={selectedCountryFrom}
+                  label="From Country"
+                  onChange={handleChangeFrom}
+                >
+                  {Currencise.map((currency) => (
+                    <MenuItem key={currency.code} value={currency.code}>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Avatar
+                          src={currency.flag}
+                          alt={`Flag of ${currency.country}`}
+                          sx={{ width: 24, height: 24, marginRight: 1 }}
+                        />
+                        <ListItemText primary={currency.country} />
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-        <SubBtn onClick={handleClick} />
+              <SwapHorizIcon sx={{ my: 2, fontSize: 30 }} />
+              <FormControl sx={{ width: 250 }}>
+                <InputLabel id="country-select-to-label">To Country</InputLabel>
+                <Select
+                  labelId="country-select-to-label"
+                  value={selectedCountryTo}
+                  label="To Country"
+                  onChange={handleChangeTo}
+                >
+                  {Currencise.map((currency) => (
+                    <MenuItem key={currency.code} value={currency.code}>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Avatar
+                          src={currency.flag}
+                          alt={`Flag of ${currency.country}`}
+                          sx={{ width: 24, height: 24, marginRight: 1 }}
+                        />
+                        <ListItemText primary={currency.country} />
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Box sx={{ display: "flex" }}>
+              <Box
+                component="form"
+                sx={{
+                  "& > :not(style)": { my: 2, minWidth: 250 },
+                }}
+                noValidate
+                autoComplete="off"
+              >
+                <TextField
+                  id="outlined-basic"
+                  label="Amount"
+                  variant="outlined"
+                  value={amount}
+                  onChange={handleAmountChange}
+                  required
+                />
+              </Box>
+              <SwapHorizIcon sx={{ my: 2, fontSize: 30 }} />
+              <Box
+                component="form"
+                sx={{
+                  "& > :not(style)": { my: 2, minWidth: 250 },
+                }}
+                noValidate
+                autoComplete="off"
+              >
+                <TextField
+                  id="outlined-basic"
+                  label="Converted Amount"
+                  variant="outlined"
+                  value={convertedAmount}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                />
+              </Box>
+            </Box>
+
+            <SubBtn onClick={handleClick} />
+          </Box>
+        </Box>
       </Container>
     </div>
   );
