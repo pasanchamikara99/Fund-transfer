@@ -12,6 +12,9 @@ ___
 
 ___
 
+![Screenshot 2024-07-05 095311](https://github.com/pasanchamikara99/Fund-transfer/assets/75413812/96422b8f-1519-4dc4-a62f-f60776f4a8a5)
+___
+
 
 ### Project Structure
 
@@ -69,4 +72,4 @@ ___
 #### Run Frontend
      npm run dev
   
-![Screenshot 2024-07-05 095311](https://github.com/pasanchamikara99/Fund-transfer/assets/75413812/96422b8f-1519-4dc4-a62f-f60776f4a8a5)
+
