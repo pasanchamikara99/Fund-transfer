@@ -17,12 +17,28 @@ const getAllTransfer = async (req, res) => {
 
   if (transfer.length > 0) {
     res.status(200).json(transfer);
-  } else {
-    res.status(404).json({ error: "No transfer found" });
   }
+};
+
+const deletetransfer = async (req, res) => {
+  const id = req.params.id;
+
+  Transfer.findByIdAndDelete(id)
+    .then((transfer) => {
+      if (transfer) {
+        res.status(200).json(transfer);
+      } else {
+        res.status(404).json({ error: "transcation not found" });
+      }
+    })
+    .catch((error) => {
+      console.error("Error deleting transcation:", error);
+      res.status(500).json({ error: "Internal server error" });
+    });
 };
 
 module.exports = {
   addtransfer,
   getAllTransfer,
+  deletetransfer,
 };
